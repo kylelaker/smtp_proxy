@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 
+"""
+Acts a sort of SMTP proxy.
+
+Some devices aren't so bright and authenticate to SMTP servers incorrectly. This can be a bit
+of an inconvenience. This will accept the messages from those devices, using no authentication,
+and then authenticate to another SMTP server (like Gmail, SES, or SendGrid) to have them be
+delivered.
+"""
+
 import asyncio
 import os
 import smtplib
@@ -16,9 +25,31 @@ class ConfigurationError(Exception):
     pass
 
 
-def parse_config(path):
+def parse_config(config_file):
+    """
+    Parses the configuration file. Since it's simple, it's sort of easier to just do
+    the checking in a fairly explicit hard-coded way.
+
+    The expected structure looks something like:
+
+    .. code-block: YAML
+        server:
+          listen:
+            addr: 0.0.0.0
+            port: 8025
+        proxy:
+          hostname: smtp.sendgrid.net
+          port: 25
+          username: apikey
+          password: SG.xxxxxxxxxxxxxxxxxxxxxxxx
+
+    :param config: The stream/file that holds the configuration
+    :raises ConfigurationError: when the configuration is invalid
+    :returns: The parsed configuration
+    :rtype: dict
+    """
     try:
-        config = yaml.safe_load(path)
+        config = yaml.safe_load(config_file)
     except yaml.YAMLError as err:
         raise ConfigurationError(str(err))
 
@@ -43,6 +74,14 @@ def parse_config(path):
 
 
 class MessageProxy(Message):
+    """
+    An aiosmtpd Handler to proxy messages.
+
+    Receives the message and initiates a connection to the remote server to end it. A new
+    connection to the remote server will be established for each message. Any failures from
+    sending will not be reported back to the client.
+    """
+
     def __init__(self, proxy_config, message_class=None):
         super().__init__(message_class)
         self.proxy_config = proxy_config
@@ -65,6 +104,10 @@ class MessageProxy(Message):
 
 
 async def server_main(loop, proxy_config, server_config):
+    """
+    Initialize the controller for asyncio.
+    """
+
     controller = Controller(
         MessageProxy(proxy_config),
         hostname=server_config['listen']['addr'],
