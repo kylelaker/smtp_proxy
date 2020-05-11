@@ -1,4 +1,3 @@
-pylint
 aiosmtpd
 ruamel.yaml
 click
