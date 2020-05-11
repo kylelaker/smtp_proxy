@@ -2,14 +2,10 @@
 
 import asyncio
 import os
-import smtpd
 import smtplib
-import sys
-import traceback
 
 import aiosmtpd
 import click
-import xdg
 import ruamel.yaml as yaml
 
 from aiosmtpd.controller import Controller
@@ -74,7 +70,7 @@ class MessageProxy(Message):
     '-f',
     type=click.File(),
     help="The path to the configuration file",
-    default=os.path.join(xdg.XDG_CONFIG_HOME, "smtp-proxy", "config.yaml")
+    required=True,
 )
 def main(config_file):
 

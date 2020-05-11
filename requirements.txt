@@ -1,4 +1,3 @@
 aiosmtpd
 ruamel.yaml
 click
-xdg
