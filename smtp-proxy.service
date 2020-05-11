@@ -1,0 +1,12 @@
+[Unit]
+Description = Proxy for SMTP requests
+After = network-online.target
+Requires = network-online.target
+
+[Service]
+Type = simple
+ExecStart = /usr/local/bin/smtp_proxy.py -f /etc/smtp_proxy/config.yaml
+Restart = on-failure
+
+[Install]
+WantedBy = multi-user.target
