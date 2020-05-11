@@ -92,7 +92,7 @@ class MessageProxy(Message):
         else:
             smtp_init = smtplib.SMTP
         client = smtp_init(hostname, port)
-        if tls.lower() == 'starttls':
+        if str(tls).lower() == 'starttls':
             client.starttls()
         client.login(username, password)
         return client
