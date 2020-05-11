@@ -2,7 +2,7 @@
 
 set -e
 
-dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" > dev/null 2>&1 && pwd)"
+dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null 2>&1 && pwd)"
 
 sudo echo "" > /dev/null
 sudo mkdir -p /etc/systemd/system
