@@ -64,6 +64,15 @@ class MessageProxy(Message):
         client.quit()
 
 
+async def server_main(loop, proxy_config, server_config):
+    controller = Controller(
+        MessageProxy(proxy_config),
+        hostname=server_config['listen']['addr'],
+        port=server_config['listen']['port'],
+    )
+    controller.start()
+
+
 @click.command('smtp-proxy')
 @click.option(
     '--config-file',
@@ -82,14 +91,13 @@ def main(config_file):
 
     server = config['server']
     proxy = config['proxy']
-    controller = Controller(
-        MessageProxy(proxy),
-        hostname=server['listen']['addr'],
-        port=server['listen']['port'],
-    )
-    controller.start()
-    input("Press enter to stop the server")
-    controller.stop()
+    loop = asyncio.get_event_loop()
+    loop.create_task(server_main(loop, proxy, server))
+    try:
+        loop.run_forever()
+    except KeyboardInterrupt:
+        pass
+
 
 if __name__ == '__main__':
     main()
