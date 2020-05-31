@@ -12,6 +12,7 @@ delivered.
 import asyncio
 import os
 import smtplib
+import sys
 
 import aiosmtpd
 import click
@@ -41,6 +42,7 @@ def parse_config(config_file):
           hostname: smtp.sendgrid.net
           port: 25
           username: apikey
+          tls: STARTTLS
           password: SG.xxxxxxxxxxxxxxxxxxxxxxxx
 
     :param config: The stream/file that holds the configuration
@@ -130,7 +132,7 @@ def main(config_file):
         config = parse_config(config_file)
     except ConfigurationError as e:
         print(e)
-        return
+        return 1
 
     server = config['server']
     proxy = config['proxy']
@@ -140,7 +142,8 @@ def main(config_file):
         loop.run_forever()
     except KeyboardInterrupt:
         pass
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
