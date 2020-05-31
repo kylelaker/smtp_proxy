@@ -97,9 +97,11 @@ class MessageProxy(Message):
         if str(tls).lower() == 'starttls':
             client.starttls()
         client.login(username, password)
+        print(f"Successfully logged in to {hostname}:{port}")
         return client
 
     def handle_message(self, message):
+        print(f"Passing message: {message}")
         client = self._initialize_client(**self.proxy_config)
         client.send_message(message)
         client.quit()
